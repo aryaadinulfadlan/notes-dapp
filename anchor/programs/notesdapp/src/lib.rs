@@ -7,62 +7,67 @@ declare_id!("DWwD3X6V5QwGEpktGQSrhKU2JVKiwp8vX6ztZj3BGkxT");
 #[program]
 pub mod notesdapp {
     use super::*;
-
-    pub fn close(_ctx: Context<CloseNotesdapp>) -> Result<()> {
+    pub fn create_note(ctx: Context<CreateNote>, title: String, content: String) -> Result<()> {
+        let note = &mut ctx.accounts.note;
+        let clock = Clock::get()?;
+        require!(title.len() <= 20, NotesError::TitleTooLong);
+        require!(content.len() <= 100, NotesError::ContentTooLong);
+        require!(!title.trim().is_empty(), NotesError::TitleEmpty);
+        require!(!content.trim().is_empty(), NotesError::ContentEmpty);
+        note.author = ctx.accounts.author.key();
+        note.title = title.clone();
+        note.content = content.clone();
+        note.created_at = clock.unix_timestamp;
+        note.updated_at = clock.unix_timestamp;
+        msg!(
+            "Note created! Title: {}, Author: {}, Created At: {}",
+            note.title,
+            note.author,
+            note.created_at
+        );
         Ok(())
     }
-
-    pub fn decrement(ctx: Context<Update>) -> Result<()> {
-        ctx.accounts.notesdapp.count = ctx.accounts.notesdapp.count.checked_sub(1).unwrap();
-        Ok(())
-    }
-
-    pub fn increment(ctx: Context<Update>) -> Result<()> {
-        ctx.accounts.notesdapp.count = ctx.accounts.notesdapp.count.checked_add(1).unwrap();
-        Ok(())
-    }
-
-    pub fn initialize(_ctx: Context<InitializeNotesdapp>) -> Result<()> {
-        Ok(())
-    }
-
-    pub fn set(ctx: Context<Update>, value: u8) -> Result<()> {
-        ctx.accounts.notesdapp.count = value.clone();
-        Ok(())
-    }
-}
-
-#[derive(Accounts)]
-pub struct InitializeNotesdapp<'info> {
-    #[account(mut)]
-    pub payer: Signer<'info>,
-    #[account(
-        init,
-        space = 8 + Notesdapp::INIT_SPACE,
-        payer = payer
-    )]
-    pub notesdapp: Account<'info, Notesdapp>,
-    pub system_program: Program<'info, System>,
-}
-#[derive(Accounts)]
-pub struct CloseNotesdapp<'info> {
-    #[account(mut)]
-    pub payer: Signer<'info>,
-    #[account(
-        mut,
-        close = payer, // close account and return lamports to payer
-    )]
-    pub notesdapp: Account<'info, Notesdapp>,
-}
-
-#[derive(Accounts)]
-pub struct Update<'info> {
-    #[account(mut)]
-    pub notesdapp: Account<'info, Notesdapp>,
 }
 
 #[account]
 #[derive(InitSpace)]
-pub struct Notesdapp {
-    count: u8,
+pub struct Note {
+    pub author: Pubkey,
+    #[max_len(20)]
+    pub title: String,
+    #[max_len(100)]
+    pub content: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+}
+
+#[error_code]
+pub enum NotesError {
+    #[msg("Title cannot be longer than 20 chars")]
+    TitleTooLong,
+    #[msg("Content cannot be longer than 100 chars")]
+    ContentTooLong,
+    #[msg("Title cannot be empty")]
+    TitleEmpty,
+    #[msg("Content cannot be empty")]
+    ContentEmpty,
+    #[msg("Unauthorized")]
+    Unauthorized,
+}
+
+#[derive(Accounts)]
+#[instruction(title: String)]
+pub struct CreateNote<'info> {
+    #[account(mut)]
+    pub author: Signer<'info>,
+    #[account(
+        init,
+        payer = author,
+        space = 8 + Note::INIT_SPACE,
+        // seeds = [b"note", author.key().as_ref(), &hash(title.as_bytes()).to_bytes()],
+        seeds = [b"note", author.key().as_ref(), title.as_bytes()],
+        bump,
+    )]
+    pub note: Account<'info, Note>,
+    pub system_program: Program<'info, System>,
 }
