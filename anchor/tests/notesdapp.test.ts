@@ -2,20 +2,13 @@ import {
   Blockhash,
   createSolanaClient,
   createTransaction,
-  generateKeyPairSigner,
+  getAddressEncoder,
+  getProgramDerivedAddress,
   Instruction,
-  isSolanaError,
   KeyPairSigner,
   signTransactionMessageWithSigners,
 } from 'gill'
-import {
-  fetchNotesdapp,
-  getCloseInstruction,
-  getDecrementInstruction,
-  getIncrementInstruction,
-  getInitializeInstruction,
-  getSetInstruction,
-} from '../src'
+import { fetchNote, getCreateNoteInstruction, NOTESDAPP_PROGRAM_ADDRESS } from '../src'
 
 import { loadKeypairSignerFromFile } from 'gill/node'
 
@@ -23,106 +16,33 @@ const { rpc, sendAndConfirmTransaction } = createSolanaClient({ urlOrMoniker: pr
 
 describe('notesdapp', () => {
   let payer: KeyPairSigner
-  let notesdapp: KeyPairSigner
 
   beforeAll(async () => {
-    notesdapp = await generateKeyPairSigner()
     payer = await loadKeypairSignerFromFile(process.env.ANCHOR_WALLET!)
   })
 
-  it('Initialize Notesdapp', async () => {
-    // ARRANGE
-    expect.assertions(1)
-    const ix = getInitializeInstruction({ payer: payer, notesdapp: notesdapp })
-
-    // ACT
-    await sendAndConfirm({ ix, payer })
-
-    // ASSER
-    const currentNotesdapp = await fetchNotesdapp(rpc, notesdapp.address)
-    expect(currentNotesdapp.data.count).toEqual(0)
-  })
-
-  it('Increment Notesdapp', async () => {
-    // ARRANGE
-    expect.assertions(1)
-    const ix = getIncrementInstruction({
-      notesdapp: notesdapp.address,
+  it('should create note data', async () => {
+    expect.assertions(3)
+    const title = 'Data Structure'
+    const content = 'Why do you need to understand Data Structure concept'
+    const [notePda] = await getProgramDerivedAddress({
+      programAddress: NOTESDAPP_PROGRAM_ADDRESS,
+      seeds: [Buffer.from('note', 'utf8'), getAddressEncoder().encode(payer.address), Buffer.from(title, 'utf8')],
     })
-
-    // ACT
-    await sendAndConfirm({ ix, payer })
-
-    // ASSERT
-    const currentCount = await fetchNotesdapp(rpc, notesdapp.address)
-    expect(currentCount.data.count).toEqual(1)
-  })
-
-  it('Increment Notesdapp Again', async () => {
-    // ARRANGE
-    expect.assertions(1)
-    const ix = getIncrementInstruction({ notesdapp: notesdapp.address })
-
-    // ACT
-    await sendAndConfirm({ ix, payer })
-
-    // ASSERT
-    const currentCount = await fetchNotesdapp(rpc, notesdapp.address)
-    expect(currentCount.data.count).toEqual(2)
-  })
-
-  it('Decrement Notesdapp', async () => {
-    // ARRANGE
-    expect.assertions(1)
-    const ix = getDecrementInstruction({
-      notesdapp: notesdapp.address,
+    const ix = getCreateNoteInstruction({
+      author: payer,
+      title,
+      content,
+      note: notePda,
     })
-
-    // ACT
-    await sendAndConfirm({ ix, payer })
-
-    // ASSERT
-    const currentCount = await fetchNotesdapp(rpc, notesdapp.address)
-    expect(currentCount.data.count).toEqual(1)
-  })
-
-  it('Set notesdapp value', async () => {
-    // ARRANGE
-    expect.assertions(1)
-    const ix = getSetInstruction({ notesdapp: notesdapp.address, value: 42 })
-
-    // ACT
-    await sendAndConfirm({ ix, payer })
-
-    // ASSERT
-    const currentCount = await fetchNotesdapp(rpc, notesdapp.address)
-    expect(currentCount.data.count).toEqual(42)
-  })
-
-  it('Set close the notesdapp account', async () => {
-    // ARRANGE
-    expect.assertions(1)
-    const ix = getCloseInstruction({
-      payer: payer,
-      notesdapp: notesdapp.address,
-    })
-
-    // ACT
-    await sendAndConfirm({ ix, payer })
-
-    // ASSERT
-    try {
-      await fetchNotesdapp(rpc, notesdapp.address)
-    } catch (e) {
-      if (!isSolanaError(e)) {
-        throw new Error(`Unexpected error: ${e}`)
-      }
-      expect(e.message).toEqual(`Account not found at address: ${notesdapp.address}`)
-    }
+    const sx = await sendAndConfirm({ ix, payer })
+    expect(sx).toBeDefined()
+    const currentNote = await fetchNote(rpc, notePda)
+    expect(currentNote.data.title).toEqual(title)
+    expect(currentNote.data.content).toEqual(content)
   })
 })
 
-// Helper function to keep the tests DRY
 let latestBlockhash: Awaited<ReturnType<typeof getLatestBlockhash>> | undefined
 async function getLatestBlockhash(): Promise<Readonly<{ blockhash: Blockhash; lastValidBlockHeight: bigint }>> {
   if (latestBlockhash) {
