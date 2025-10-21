@@ -16,7 +16,7 @@ import {
   getInitializeInstruction,
   getSetInstruction,
 } from '../src'
-// @ts-ignore error TS2307 suggest setting `moduleResolution` but this is already configured
+
 import { loadKeypairSignerFromFile } from 'gill/node'
 
 const { rpc, sendAndConfirmTransaction } = createSolanaClient({ urlOrMoniker: process.env.ANCHOR_PROVIDER_URL! })

@@ -9,8 +9,9 @@ import { AccountUiBalance } from '@/features/account/ui/account-ui-balance'
 import { AppExplorerLink } from '@/components/app-explorer-link'
 import { AccountUiButtons } from '@/features/account/ui/account-ui-buttons'
 import { AccountUiTokens } from '@/features/account/ui/account-ui-tokens'
+import dynamic from 'next/dynamic'
 
-export default function AccountFeatureDetail() {
+function AccountFeatureDetail() {
   const params = useParams()
   const address = useMemo(() => {
     if (!params.address || typeof params.address !== 'string') {
@@ -44,3 +45,5 @@ export default function AccountFeatureDetail() {
     </div>
   )
 }
+
+export default dynamic(() => Promise.resolve(AccountFeatureDetail), { ssr: false })

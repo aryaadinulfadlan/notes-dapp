@@ -1,8 +1,8 @@
 #![allow(clippy::result_large_err)]
-
+#![allow(unexpected_cfgs)]
 use anchor_lang::prelude::*;
 
-declare_id!("Count3AcZucFDPSFBAeHkQ6AvttieKUkyJ8HiQGhQwe");
+declare_id!("DWwD3X6V5QwGEpktGQSrhKU2JVKiwp8vX6ztZj3BGkxT");
 
 #[program]
 pub mod notesdapp {
@@ -36,11 +36,10 @@ pub mod notesdapp {
 pub struct InitializeNotesdapp<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
-
     #[account(
-  init,
-  space = 8 + Notesdapp::INIT_SPACE,
-  payer = payer
+        init,
+        space = 8 + Notesdapp::INIT_SPACE,
+        payer = payer
     )]
     pub notesdapp: Account<'info, Notesdapp>,
     pub system_program: Program<'info, System>,
@@ -49,10 +48,9 @@ pub struct InitializeNotesdapp<'info> {
 pub struct CloseNotesdapp<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
-
     #[account(
-  mut,
-  close = payer, // close account and return lamports to payer
+        mut,
+        close = payer, // close account and return lamports to payer
     )]
     pub notesdapp: Account<'info, Notesdapp>,
 }

@@ -22,7 +22,7 @@ import {
 } from '../instructions';
 
 export const NOTESDAPP_PROGRAM_ADDRESS =
-  'Count3AcZucFDPSFBAeHkQ6AvttieKUkyJ8HiQGhQwe' as Address<'Count3AcZucFDPSFBAeHkQ6AvttieKUkyJ8HiQGhQwe'>;
+  'DWwD3X6V5QwGEpktGQSrhKU2JVKiwp8vX6ztZj3BGkxT' as Address<'DWwD3X6V5QwGEpktGQSrhKU2JVKiwp8vX6ztZj3BGkxT'>;
 
 export enum NotesdappAccount {
   Notesdapp,
@@ -121,7 +121,7 @@ export function identifyNotesdappInstruction(
 }
 
 export type ParsedNotesdappInstruction<
-  TProgram extends string = 'Count3AcZucFDPSFBAeHkQ6AvttieKUkyJ8HiQGhQwe',
+  TProgram extends string = 'DWwD3X6V5QwGEpktGQSrhKU2JVKiwp8vX6ztZj3BGkxT',
 > =
   | ({
       instructionType: NotesdappInstruction.Close;
