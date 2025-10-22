@@ -5,10 +5,17 @@ import {
   getAddressEncoder,
   getProgramDerivedAddress,
   Instruction,
+  isSolanaError,
   KeyPairSigner,
   signTransactionMessageWithSigners,
 } from 'gill'
-import { fetchNote, getCreateNoteInstruction, getUpdateNoteInstruction, NOTESDAPP_PROGRAM_ADDRESS } from '../src'
+import {
+  fetchNote,
+  getCreateNoteInstruction,
+  getDeleteNoteInstruction,
+  getUpdateNoteInstruction,
+  NOTESDAPP_PROGRAM_ADDRESS,
+} from '../src'
 
 import { loadKeypairSignerFromFile } from 'gill/node'
 
@@ -73,6 +80,42 @@ describe('notesdapp', () => {
     const updatedNote = await fetchNote(rpc, notePda)
     expect(updatedNote.data.title).toEqual(title)
     expect(updatedNote.data.content).toEqual(updatedContent)
+  })
+  it('should delete note data', async () => {
+    expect.assertions(5)
+    const title = 'Data Structure Del'
+    const content = 'Why do you need to understand Data Structure concept Delete'
+    const [notePda] = await getProgramDerivedAddress({
+      programAddress: NOTESDAPP_PROGRAM_ADDRESS,
+      seeds: [Buffer.from('note', 'utf8'), getAddressEncoder().encode(payer.address), Buffer.from(title, 'utf8')],
+    })
+    const ix = getCreateNoteInstruction({
+      author: payer,
+      title,
+      content,
+      note: notePda,
+    })
+    const sx = await sendAndConfirm({ ix, payer })
+    expect(sx).toBeDefined()
+    const currentNote = await fetchNote(rpc, notePda)
+    expect(currentNote.data.title).toEqual(title)
+    expect(currentNote.data.content).toEqual(content)
+
+    const ixDelete = getDeleteNoteInstruction({
+      author: payer,
+      title,
+      note: notePda,
+    })
+    const sxDelete = await sendAndConfirm({ ix: ixDelete, payer })
+    expect(sxDelete).toBeDefined()
+    try {
+      await fetchNote(rpc, notePda)
+    } catch (error) {
+      if (!isSolanaError(error)) {
+        throw new Error(`Unexpected error: ${error}`)
+      }
+      expect(error.message).toEqual(`Account not found at address: ${notePda}`)
+    }
   })
 })
 
