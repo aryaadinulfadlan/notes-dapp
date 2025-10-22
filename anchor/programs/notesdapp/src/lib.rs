@@ -27,6 +27,25 @@ pub mod notesdapp {
         );
         Ok(())
     }
+
+    pub fn update_note(
+        ctx: Context<UpdateNote>,
+        _title: String,
+        content: String,
+    ) -> Result<()> {
+        let note = &mut ctx.accounts.note;
+        let clock = Clock::get()?;
+        require!(note.author == ctx.accounts.author.key(), NotesError::Unauthorized);
+        // require!(title.len() <= 20, NotesError::TitleTooLong);
+        require!(content.len() <= 100, NotesError::ContentTooLong);
+        // require!(!title.trim().is_empty(), NotesError::TitleEmpty);
+        require!(!content.trim().is_empty(), NotesError::ContentEmpty);
+        // note.title = title.clone();
+        note.content = content.clone();
+        note.updated_at = clock.unix_timestamp;
+        msg!("Note {} update!", note.title);
+        Ok(())
+    }
 }
 
 #[account]
@@ -67,6 +86,23 @@ pub struct CreateNote<'info> {
         // seeds = [b"note", author.key().as_ref(), &hash(title.as_bytes()).to_bytes()],
         seeds = [b"note", author.key().as_ref(), title.as_bytes()],
         bump,
+    )]
+    pub note: Account<'info, Note>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(title: String)]
+pub struct UpdateNote<'info> {
+    #[account(mut)]
+    pub author: Signer<'info>,
+    #[account(
+        mut,
+        realloc = 8 + Note::INIT_SPACE,
+        realloc::payer = author, 
+        realloc::zero = true, 
+        seeds = [b"note", author.key().as_ref(), title.as_bytes()],
+        bump, 
     )]
     pub note: Account<'info, Note>,
     pub system_program: Program<'info, System>,
