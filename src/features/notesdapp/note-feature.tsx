@@ -2,16 +2,16 @@
 import { useSolana } from '@/components/solana/use-solana'
 import { WalletDropdown } from '@/components/wallet-dropdown'
 import { AppHero } from '@/components/app-hero'
-import { NotesdappUiList } from './ui/notesdapp-ui-list'
-import { NotesdappUiProgramExplorerLink } from './ui/notesdapp-ui-program-explorer-link'
-import { NotesdappUiProgramGuard } from './ui/notesdapp-ui-program-guard'
-import NoteCreate from './ui/note-create'
+import { NoteUIList } from './ui/note-ui-list'
+import { NoteUIProgramExplorerLink } from './ui/note-ui-program-explorer-link'
+import { NoteUIProgramGuard } from './ui/note-ui-program-guard'
+import NoteUICreate from './ui/note-ui-create'
 
-export default function NotesdappFeature() {
+export default function NoteFeature() {
   const { account } = useSolana()
 
   return (
-    <NotesdappUiProgramGuard>
+    <NoteUIProgramGuard>
       <AppHero
         title="Notes Decentralized Application"
         subtitle={
@@ -20,16 +20,16 @@ export default function NotesdappFeature() {
             : 'Select a wallet to run the program.'
         }
       >
-        <NotesdappUiProgramExplorerLink />
+        <NoteUIProgramExplorerLink />
       </AppHero>
       {account ? (
-        <NoteCreate account={account} />
+        <NoteUICreate account={account} />
       ) : (
         <div style={{ display: 'inline-block' }}>
           <WalletDropdown />
         </div>
       )}
-      {account ? <NotesdappUiList account={account} /> : null}
-    </NotesdappUiProgramGuard>
+      {account ? <NoteUIList account={account} /> : null}
+    </NoteUIProgramGuard>
   )
 }

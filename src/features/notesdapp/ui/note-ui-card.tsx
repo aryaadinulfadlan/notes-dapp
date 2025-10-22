@@ -4,12 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/
 import { AppExplorerLink } from '@/components/app-explorer-link'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
+import { NoteUIButtonUpdate } from './note-ui-button-update'
 
 interface Props {
   account: UiWalletAccount
   notesdapp: NotesdappAccount
 }
-export function NotesdappUiCard({ account, notesdapp }: Props) {
+export function NoteUICard({ account, notesdapp }: Props) {
   const createdAt = new Date(Number(notesdapp.data.createdAt) * 1000).toLocaleString()
   const updatedAt = new Date(Number(notesdapp.data.updatedAt) * 1000).toLocaleString()
   const [editable, setEditable] = useState(false)
@@ -26,7 +27,9 @@ export function NotesdappUiCard({ account, notesdapp }: Props) {
         </p>
         {editable ? (
           <div className="grid gap-1">
-            <label htmlFor="content">Content</label>
+            <label htmlFor="content" className="font-bold">
+              Content
+            </label>
             <input
               type="text"
               value={content}
@@ -56,7 +59,12 @@ export function NotesdappUiCard({ account, notesdapp }: Props) {
             <Button className="bg-gray-600 text-white" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button className="bg-green-700 text-white">Update</Button>
+            <NoteUIButtonUpdate
+              account={account}
+              title={notesdapp.data.title}
+              content={content}
+              setEditable={setEditable}
+            />
           </div>
         ) : (
           <>

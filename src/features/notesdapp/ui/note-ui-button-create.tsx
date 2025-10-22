@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button'
 import { UiWalletAccount } from '@wallet-ui/react'
-import { useNotesdappCreateMutation } from '../data-access/use-notesdapp-create-mutation'
+import { useNoteCreateMutation } from '../data-access/use-note-create-mutation'
 
-export function NotesdappUiButtonCreate({
+export function NoteUIButtonCreate({
   account,
   title,
   content,
@@ -11,13 +11,12 @@ export function NotesdappUiButtonCreate({
   title: string
   content: string
 }) {
-  const mutationCreate = useNotesdappCreateMutation({ account, title, content })
+  const mutationCreate = useNoteCreateMutation({ account, title, content })
 
   return (
     <Button
       onClick={() => mutationCreate.mutateAsync()}
       disabled={mutationCreate.isPending || !title.trim() || !content.trim()}
-      variant={'default'}
       className="font-bold md:text-lg md:py-5"
     >
       Create Note {mutationCreate.isPending && '...'}

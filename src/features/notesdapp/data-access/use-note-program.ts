@@ -3,7 +3,7 @@ import { useSolana } from '@/components/solana/use-solana'
 import { useQuery } from '@tanstack/react-query'
 import { useClusterVersion } from '@/features/cluster/data-access/use-cluster-version'
 
-export function useNotesdappProgram() {
+export function useNoteProgram() {
   const { client, cluster } = useSolana()
   const query = useClusterVersion()
 

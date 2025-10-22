@@ -1,5 +1,5 @@
-import NotesdappFeature from '@/features/notesdapp/notesdapp-feature'
+import NoteFeature from '@/features/notesdapp/note-feature'
 
 export default function HomePage() {
-  return <NotesdappFeature />
+  return <NoteFeature />
 }

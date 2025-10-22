@@ -1,9 +1,9 @@
-import { useNotesdappAccountsQuery } from '@/features/notesdapp/data-access/use-notesdapp-accounts-query'
+import { useNoteAccountsQuery } from '@/features/notesdapp/data-access/use-note-accounts-query'
 import { UiWalletAccount } from '@wallet-ui/react'
-import { NotesdappUiCard } from './notesdapp-ui-card'
+import { NoteUICard } from './note-ui-card'
 
-export function NotesdappUiList({ account }: { account: UiWalletAccount }) {
-  const notesdappAccountsQuery = useNotesdappAccountsQuery()
+export function NoteUIList({ account }: { account: UiWalletAccount }) {
+  const notesdappAccountsQuery = useNoteAccountsQuery()
   console.log({ notesdappAccountsQuery })
 
   if (notesdappAccountsQuery.isLoading) {
@@ -24,7 +24,7 @@ export function NotesdappUiList({ account }: { account: UiWalletAccount }) {
       <p className="font-bold text-lg md:text-2xl mb-4">Your Notes:</p>
       <div className="grid gap-4">
         {notesdappAccountsQuery.data?.map((notesdapp) => (
-          <NotesdappUiCard account={account} key={notesdapp.address} notesdapp={notesdapp} />
+          <NoteUICard account={account} key={notesdapp.address} notesdapp={notesdapp} />
         ))}
       </div>
     </div>

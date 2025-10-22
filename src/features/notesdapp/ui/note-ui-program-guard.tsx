@@ -2,11 +2,11 @@ import { ReactNode } from 'react'
 
 import { AppAlert } from '@/components/app-alert'
 import { useSolana } from '@/components/solana/use-solana'
-import { useNotesdappProgram } from '@/features/notesdapp/data-access/use-notesdapp-program'
+import { useNoteProgram } from '@/features/notesdapp/data-access/use-note-program'
 
-export function NotesdappUiProgramGuard({ children }: { children: ReactNode }) {
+export function NoteUIProgramGuard({ children }: { children: ReactNode }) {
   const { cluster } = useSolana()
-  const programAccountQuery = useNotesdappProgram()
+  const programAccountQuery = useNoteProgram()
 
   if (programAccountQuery.isLoading) {
     return <span className="loading loading-spinner loading-lg"></span>

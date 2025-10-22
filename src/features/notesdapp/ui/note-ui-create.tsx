@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { NotesdappUiButtonCreate } from './notesdapp-ui-button-create'
+import { NoteUIButtonCreate } from './note-ui-button-create'
 import { UiWalletAccount } from '@wallet-ui/react'
 
 interface Props {
   account: UiWalletAccount
 }
-export default function NoteCreate({ account }: Props) {
+export default function NoteUICreate({ account }: Props) {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   return (
@@ -31,7 +31,7 @@ export default function NoteCreate({ account }: Props) {
           className="text-white px-2 py-1.5 rounded-sm border border-gray-300"
         />
       </div>
-      <NotesdappUiButtonCreate account={account} title={title} content={content} />
+      <NoteUIButtonCreate account={account} title={title} content={content} />
     </div>
   )
 }
