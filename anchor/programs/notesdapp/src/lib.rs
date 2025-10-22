@@ -46,6 +46,13 @@ pub mod notesdapp {
         msg!("Note {} update!", note.title);
         Ok(())
     }
+
+    pub fn delete_note(ctx: Context<DeleteNote>, title: String) -> Result<()> {
+        let note = &ctx.accounts.note;
+        require!(note.author == ctx.accounts.author.key(), NotesError::Unauthorized);
+        msg!("Note {} deleted!", title);
+        Ok(())
+    }
 }
 
 #[account]
@@ -106,4 +113,18 @@ pub struct UpdateNote<'info> {
     )]
     pub note: Account<'info, Note>,
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(title: String)]
+pub struct DeleteNote<'info> {
+    #[account(mut)]
+    pub author: Signer<'info>,
+    #[account(
+        mut,
+        close = author,
+        seeds = [b"note", author.key().as_ref(), title.as_bytes()],
+        bump,
+    )]
+    pub note: Account<'info, Note>,
 }
