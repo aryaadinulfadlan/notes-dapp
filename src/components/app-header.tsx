@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { ThemeSelect } from '@/components/theme-select'
 import { WalletDropdown } from '@/components/wallet-dropdown'
+import GithubLink from './github-link'
 
 const ClusterDropdown = dynamic(() => import('@/components/cluster-dropdown').then((m) => m.ClusterDropdown), {
   ssr: false,
@@ -51,6 +52,7 @@ export function AppHeader({ links = [] }: { links: { label: string; path: string
           <WalletDropdown />
           <ClusterDropdown />
           <ThemeSelect />
+          <GithubLink />
         </div>
 
         {showMenu && (
@@ -60,6 +62,7 @@ export function AppHeader({ links = [] }: { links: { label: string; path: string
                 <WalletDropdown />
                 <ClusterDropdown />
                 <ThemeSelect />
+                <GithubLink />
               </div>
               <ul className="flex flex-col gap-4">
                 {links.map(({ label, path }) => (
