@@ -1,5 +1,5 @@
-import DashboardFeature from '@/features/dashboard/dashboard-feature'
+import NotesdappFeature from '@/features/notesdapp/notesdapp-feature'
 
-export default function Home() {
-  return <DashboardFeature />
+export default function HomePage() {
+  return <NotesdappFeature />
 }

@@ -17,7 +17,7 @@ export function AppExplorerLink({
       href={getExplorerLink({ ...link, cluster: getSolanaClusterMoniker(cluster.id) })}
       target="_blank"
       rel="noopener noreferrer"
-      className={className ? className : `link font-mono inline-flex gap-1`}
+      className={className ? className : `text-blue-300 text-sm md:text-base link font-mono inline-flex gap-1`}
     >
       {label}
       <ArrowUpRightFromSquare size={12} />

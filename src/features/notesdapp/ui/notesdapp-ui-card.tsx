@@ -1,28 +1,77 @@
 import { NotesdappAccount } from '@project/anchor'
 import { ellipsify, UiWalletAccount } from '@wallet-ui/react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 import { AppExplorerLink } from '@/components/app-explorer-link'
-import { NotesdappUiButtonClose } from './notesdapp-ui-button-close'
-import { NotesdappUiButtonDecrement } from './notesdapp-ui-button-decrement'
-import { NotesdappUiButtonIncrement } from './notesdapp-ui-button-increment'
-import { NotesdappUiButtonSet } from './notesdapp-ui-button-set'
+import { Button } from '@/components/ui/button'
+import { useState } from 'react'
 
-export function NotesdappUiCard({ account, notesdapp }: { account: UiWalletAccount; notesdapp: NotesdappAccount }) {
+interface Props {
+  account: UiWalletAccount
+  notesdapp: NotesdappAccount
+}
+export function NotesdappUiCard({ account, notesdapp }: Props) {
+  const createdAt = new Date(Number(notesdapp.data.createdAt) * 1000).toLocaleString()
+  const updatedAt = new Date(Number(notesdapp.data.updatedAt) * 1000).toLocaleString()
+  const [editable, setEditable] = useState(false)
+  const [content, setContent] = useState(notesdapp.data.content)
+  const handleCancel = () => {
+    setEditable(false)
+    setContent(notesdapp.data.content)
+  }
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Notesdapp: {notesdapp.data.count}</CardTitle>
+    <Card className="py-0 p-2">
+      <CardHeader className="px-2">
+        <p className="text-sm md:text-base">
+          <span className="font-bold">Title:</span> {notesdapp.data.title}
+        </p>
+        {editable ? (
+          <div className="grid gap-1">
+            <label htmlFor="content">Content</label>
+            <input
+              type="text"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Content here.."
+              className="text-white px-1.5 py-1 rounded-sm border border-gray-300"
+            />
+          </div>
+        ) : (
+          <p className="text-sm md:text-base">
+            <span className="font-bold">Content:</span> {notesdapp.data.content}
+          </p>
+        )}
+        <p className="text-xs md:text-sm">
+          <span className="font-bold">Created At:</span> {createdAt}
+        </p>
+        <p className="text-xs md:text-sm">
+          <span className="font-bold">Updated At:</span> {updatedAt}
+        </p>
         <CardDescription>
           Account: <AppExplorerLink address={notesdapp.address} label={ellipsify(notesdapp.address)} />
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="flex gap-4 justify-evenly">
+      <CardContent className="px-2 flex items-center gap-4">
+        {editable ? (
+          <div className="flex items-center gap-4">
+            <Button className="bg-gray-600 text-white" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button className="bg-green-700 text-white">Update</Button>
+          </div>
+        ) : (
+          <>
+            <Button className="bg-gray-600 text-white" onClick={() => setEditable(true)}>
+              Edit
+            </Button>
+            <Button className="bg-red-600 text-white">Delete</Button>
+          </>
+        )}
+        {/* <div className="flex gap-4 justify-evenly">
           <NotesdappUiButtonIncrement account={account} notesdapp={notesdapp} />
           <NotesdappUiButtonSet account={account} notesdapp={notesdapp} />
           <NotesdappUiButtonDecrement account={account} notesdapp={notesdapp} />
           <NotesdappUiButtonClose account={account} notesdapp={notesdapp} />
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   )
