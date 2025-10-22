@@ -5,6 +5,7 @@ import { AppExplorerLink } from '@/components/app-explorer-link'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { NoteUIButtonUpdate } from './note-ui-button-update'
+import { NoteUIButtonDelete } from './note-ui-button-delete'
 
 interface Props {
   account: UiWalletAccount
@@ -71,7 +72,7 @@ export function NoteUICard({ account, notesdapp }: Props) {
             <Button className="bg-gray-600 text-white" onClick={() => setEditable(true)}>
               Edit
             </Button>
-            <Button className="bg-red-600 text-white">Delete</Button>
+            <NoteUIButtonDelete account={account} title={notesdapp.data.title} />
           </>
         )}
         {/* <div className="flex gap-4 justify-evenly">
