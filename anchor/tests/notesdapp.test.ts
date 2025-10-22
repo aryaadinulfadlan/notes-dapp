@@ -8,7 +8,7 @@ import {
   KeyPairSigner,
   signTransactionMessageWithSigners,
 } from 'gill'
-import { fetchNote, getCreateNoteInstruction, NOTESDAPP_PROGRAM_ADDRESS } from '../src'
+import { fetchNote, getCreateNoteInstruction, getUpdateNoteInstruction, NOTESDAPP_PROGRAM_ADDRESS } from '../src'
 
 import { loadKeypairSignerFromFile } from 'gill/node'
 
@@ -40,6 +40,39 @@ describe('notesdapp', () => {
     const currentNote = await fetchNote(rpc, notePda)
     expect(currentNote.data.title).toEqual(title)
     expect(currentNote.data.content).toEqual(content)
+  })
+  it('should update note data', async () => {
+    expect.assertions(6)
+    const title = 'Data Structure New'
+    const content = 'Why do you need to understand Data Structure concept New'
+    const [notePda] = await getProgramDerivedAddress({
+      programAddress: NOTESDAPP_PROGRAM_ADDRESS,
+      seeds: [Buffer.from('note', 'utf8'), getAddressEncoder().encode(payer.address), Buffer.from(title, 'utf8')],
+    })
+    const ix = getCreateNoteInstruction({
+      author: payer,
+      title,
+      content,
+      note: notePda,
+    })
+    const sx = await sendAndConfirm({ ix, payer })
+    expect(sx).toBeDefined()
+    const currentNote = await fetchNote(rpc, notePda)
+    expect(currentNote.data.title).toEqual(title)
+    expect(currentNote.data.content).toEqual(content)
+
+    const updatedContent = 'Content updated'
+    const ixUpdate = getUpdateNoteInstruction({
+      author: payer,
+      title,
+      content: updatedContent,
+      note: notePda,
+    })
+    const sxUpdate = await sendAndConfirm({ ix: ixUpdate, payer })
+    expect(sxUpdate).toBeDefined()
+    const updatedNote = await fetchNote(rpc, notePda)
+    expect(updatedNote.data.title).toEqual(title)
+    expect(updatedNote.data.content).toEqual(updatedContent)
   })
 })
 
