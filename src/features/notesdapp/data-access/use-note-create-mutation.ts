@@ -7,6 +7,7 @@ import { getAddressEncoder, getProgramDerivedAddress } from 'gill'
 import { getCreateNoteInstruction, NOTESDAPP_PROGRAM_ADDRESS } from '@project/anchor'
 import { toastTx } from '@/components/toast-tx'
 import { toast } from 'sonner'
+import { Dispatch, SetStateAction } from 'react'
 
 // polyfill ed25519 for browsers (to allow `generateKeyPairSigner` to work)
 installEd25519()
@@ -15,10 +16,14 @@ export function useNoteCreateMutation({
   account,
   title,
   content,
+  setTitle,
+  setContent,
 }: {
   account: UiWalletAccount
   title: string
   content: string
+  setTitle: Dispatch<SetStateAction<string>>
+  setContent: Dispatch<SetStateAction<string>>
 }) {
   const { cluster } = useSolana()
   const queryClient = useQueryClient()
@@ -35,6 +40,8 @@ export function useNoteCreateMutation({
       return await signAndSend(getCreateNoteInstruction({ author: signer, note: notePda, title, content }), signer)
     },
     onSuccess: async (tx) => {
+      setTitle('')
+      setContent('')
       toastTx(tx)
       await queryClient.invalidateQueries({ queryKey: ['notesdapp', 'accounts', { cluster }] })
     },

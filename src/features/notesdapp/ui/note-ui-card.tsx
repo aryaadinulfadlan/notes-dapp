@@ -75,12 +75,6 @@ export function NoteUICard({ account, notesdapp }: Props) {
             <NoteUIButtonDelete account={account} title={notesdapp.data.title} />
           </>
         )}
-        {/* <div className="flex gap-4 justify-evenly">
-          <NotesdappUiButtonIncrement account={account} notesdapp={notesdapp} />
-          <NotesdappUiButtonSet account={account} notesdapp={notesdapp} />
-          <NotesdappUiButtonDecrement account={account} notesdapp={notesdapp} />
-          <NotesdappUiButtonClose account={account} notesdapp={notesdapp} />
-        </div> */}
       </CardContent>
     </Card>
   )

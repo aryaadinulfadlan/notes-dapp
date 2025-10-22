@@ -25,7 +25,7 @@ export default function NoteFeature() {
       {account ? (
         <NoteUICreate account={account} />
       ) : (
-        <div style={{ display: 'inline-block' }}>
+        <div className="flex justify-center">
           <WalletDropdown />
         </div>
       )}

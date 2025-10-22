@@ -31,7 +31,13 @@ export default function NoteUICreate({ account }: Props) {
           className="text-white px-2 py-1.5 rounded-sm border border-gray-300"
         />
       </div>
-      <NoteUIButtonCreate account={account} title={title} content={content} />
+      <NoteUIButtonCreate
+        account={account}
+        title={title}
+        content={content}
+        setTitle={setTitle}
+        setContent={setContent}
+      />
     </div>
   )
 }
