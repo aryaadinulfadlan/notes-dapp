@@ -14,7 +14,7 @@ import { useNoteDeleteMutation } from '../data-access/use-note-delete-mutation'
 import { UiWalletAccount } from '@wallet-ui/react'
 
 export function NoteUIButtonDelete({ account, title }: { account: UiWalletAccount; title: string }) {
-  const mutationDelete = useNoteDeleteMutation({ account, title })
+  const mutationDelete = useNoteDeleteMutation({ account })
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -29,7 +29,7 @@ export function NoteUIButtonDelete({ account, title }: { account: UiWalletAccoun
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => mutationDelete.mutateAsync()} disabled={mutationDelete.isPending}>
+          <AlertDialogAction onClick={() => mutationDelete.mutateAsync({ title })} disabled={mutationDelete.isPending}>
             Continue {mutationDelete.isPending && '...'}
           </AlertDialogAction>
         </AlertDialogFooter>

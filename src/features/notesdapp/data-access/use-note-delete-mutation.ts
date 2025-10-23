@@ -1,5 +1,4 @@
-import { useSolana } from '@/components/solana/use-solana'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { UiWalletAccount, useWalletUiSigner } from '@wallet-ui/react'
 import { useWalletUiSignAndSend } from '@wallet-ui/react-gill'
 import { install as installEd25519 } from '@solana/webcrypto-ed25519-polyfill'
@@ -7,18 +6,20 @@ import { getAddressEncoder, getProgramDerivedAddress } from 'gill'
 import { getDeleteNoteInstruction, NOTESDAPP_PROGRAM_ADDRESS } from '@project/anchor'
 import { toastTx } from '@/components/toast-tx'
 import { toast } from 'sonner'
+import { useNoteAccountsInvalidate } from './use-note-accounts-invalidate'
 
 // polyfill ed25519 for browsers (to allow `generateKeyPairSigner` to work)
 installEd25519()
-
-export function useNoteDeleteMutation({ account, title }: { account: UiWalletAccount; title: string }) {
-  const { cluster } = useSolana()
-  const queryClient = useQueryClient()
+interface Props {
+  account: UiWalletAccount
+}
+export function useNoteDeleteMutation({ account }: Props) {
+  const invalidateNotes = useNoteAccountsInvalidate()
   const signer = useWalletUiSigner({ account })
   const signAndSend = useWalletUiSignAndSend()
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({ title }: { title: string }) => {
       const [notePda] = await getProgramDerivedAddress({
         programAddress: NOTESDAPP_PROGRAM_ADDRESS,
         seeds: [Buffer.from('note', 'utf8'), getAddressEncoder().encode(signer.address), Buffer.from(title, 'utf8')],
@@ -27,7 +28,7 @@ export function useNoteDeleteMutation({ account, title }: { account: UiWalletAcc
     },
     onSuccess: async (tx) => {
       toastTx(tx)
-      await queryClient.invalidateQueries({ queryKey: ['notesdapp', 'accounts', { cluster }] })
+      await invalidateNotes()
     },
     onError: () => toast.error('Failed to run program'),
   })
