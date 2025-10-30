@@ -11,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group'
 import { useNoteUpdateMutation } from '../data-access/use-note-update-mutation'
+import { formatDate } from '@/lib/format'
 
 interface Props {
   account: UiWalletAccount
@@ -23,8 +24,8 @@ const formSchema = z.object({
     .max(100, 'Content must be at most 100 characters.'),
 })
 export function NoteUICard({ account, notesdapp }: Props) {
-  const createdAt = new Date(Number(notesdapp.data.createdAt) * 1000).toLocaleString()
-  const updatedAt = new Date(Number(notesdapp.data.updatedAt) * 1000).toLocaleString()
+  const createdAt = formatDate(Number(notesdapp.data.createdAt) * 1000)
+  const updatedAt = formatDate(Number(notesdapp.data.updatedAt) * 1000)
   const [editable, setEditable] = useState(false)
   const mutationUpdate = useNoteUpdateMutation({ account })
   const { control, handleSubmit, setValue, clearErrors } = useForm<z.infer<typeof formSchema>>({
